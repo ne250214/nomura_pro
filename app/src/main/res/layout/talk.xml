@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:id="@+id/talk_scrollview"
+        android:layout_weight="1"
+        android:background="#f8f7c9">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:paddingLeft="16dp"
+            android:paddingTop="16dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="16dp"
+            android:id="@+id/talk_linerlayout">
+
+
+    </LinearLayout>
+
+</ScrollView>
+
+<LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:weightSum="1"
+    android:layout_below="@+id/talk_scrollview"
+    android:layout_gravity="bottom">
+
+    <EditText
+        android:inputType="text"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:id="@+id/talk_send_text"
+        android:layout_gravity="start"
+        android:layout_weight="0.96"/>
+
+    <Button
+        android:layout_width="78dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:text="送信"
+        android:id="@+id/talk_send_btn"/>
+</LinearLayout>
+</LinearLayout>

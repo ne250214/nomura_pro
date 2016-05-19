@@ -1,0 +1,124 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="nomura_pro.airis">
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <permission
+        android:name="nomura_pro.airis.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+    <uses-permission
+        android:name="nomura_pro.airis.permission.C2D_MESSAGE" />
+
+    <uses-permission android:name="nomura_pro.airis.c2dm.permission.RECEIVE" />
+
+    <uses-permission android:name="android.permission.VIBRATE"/>
+
+
+    <application
+        android:allowBackup="true"
+        android:label="@string/app_name"
+        android:icon="@drawable/ic_launcher"
+        android:theme="@style/my_theme" >
+
+        <activity android:name=".Lunch">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+        </activity>
+
+        <activity android:name=".MainActivity"
+        android:label="@string/app_name">
+        </activity>
+
+        <activity android:name=".LoginOrCreate"
+        android:label="@string/app_name">
+        </activity>
+
+        <activity android:name=".SendMessage"
+            android:label="@string/app_name">
+        </activity>
+
+        <activity android:name=".NewsSelectRoom"
+            android:label="@string/app_name">
+        </activity>
+
+        <activity android:name=".GcmActivity"
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustResize">
+        </activity>
+
+        <activity android:name=".UserCreateActivity"
+            android:label="@string/app_name">
+        </activity>
+
+        <activity android:name=".UserLoginActivity"
+            android:label="@string/app_name">
+        </activity>
+
+        <activity android:name=".UserForceLoginActivity"
+        android:label="@string/app_name">
+        </activity>
+
+        <activity android:name=".Logout"
+            android:label="@string/app_name">
+        </activity>
+
+
+        <activity android:name=".UserEditNameActivity"
+            android:label="@string/app_name">
+        </activity>
+
+        <activity android:name=".UserEditPassActivity"
+            android:label="@string/app_name">
+        </activity>
+
+        <activity android:name=".UserEditProfileActivity"
+            android:label="@string/app_name">
+        </activity>
+
+        <activity android:name=".LoginCheck"
+            android:label="@string/app_name">
+        </activity>
+
+        <activity android:name=".FriendSearchActivity"
+            android:label="@string/app_name">
+        </activity>
+
+        <activity android:name=".FriendBlockList"
+        android:label="@string/app_name">
+        </activity>
+
+        <activity android:name=".GalleryTest"
+            android:label="@string/app_name">
+        </activity>
+
+        <activity android:name=".NewsList"
+            android:label="@string/app_name">
+        </activity>
+
+        <activity android:name=".MyWebView"
+        android:label="@string/app_name">
+    </activity>
+
+        <receiver
+            android:name=".GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <category android:name="nomura_pro.airis" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".GcmIntentService" />
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+    </application>
+
+
+</manifest>

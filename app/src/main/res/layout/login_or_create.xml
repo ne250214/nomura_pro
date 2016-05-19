@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical"
+    android:layout_width="match_parent"
+
+    android:background="#87CEFA"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:weightSum="1">
+
+        <ImageView
+            android:layout_width="433dp"
+            android:layout_height="113dp"
+            android:src="@drawable/main_rogo02"
+            android:layout_gravity="center"
+            android:id="@+id/loading_rogo"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:contentDescription="AIRIS"
+            android:layout_above="@+id/Login_address"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="0.20"
+            android:layout_marginTop="160dp"
+            android:layout_marginBottom="30dp" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="236dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.50">
+
+                <EditText
+                    android:layout_width="190dp"
+                    android:layout_height="45dp"
+                    android:id="@+id/Login_address"
+
+                    android:hint="メールアドレス"
+
+                    android:background="#ffffff"
+
+                    android:layout_gravity="right"
+                    android:layout_toLeftOf="@+id/user_login"
+                    android:layout_alignLeft="@+id/loading_rogo"
+                    android:layout_alignStart="@+id/loading_rogo"
+                    android:layout_centerVertical="true" />
+
+                <EditText
+                    android:layout_width="188dp"
+                    android:layout_height="45dp"
+                    android:inputType="textPassword"
+                    android:ems="10"
+                    android:id="@+id/Login_pass"
+
+                    android:hint="パスワード"
+
+                    android:background="#ffffff"
+
+                    android:layout_gravity="right"
+                    android:layout_below="@+id/Login_address"
+                    android:layout_toLeftOf="@+id/user_login"
+                    android:layout_marginTop="10dp"
+                    android:layout_alignLeft="@+id/Login_address"
+                    android:layout_alignStart="@+id/Login_address" />
+            </LinearLayout>
+
+            <Button
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:text="LOGIN"
+
+                android:background="#0000ff"
+                android:textColor="#ffffff"
+
+                android:id="@+id/user_login"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignBottom="@+id/Login_pass"
+                android:layout_below="@+id/loading_rogo"
+                android:layout_marginLeft="10dp" />
+        </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="How to use ？"
+        android:id="@+id/textView14"
+
+        android:textColor="#ffffff"
+
+        android:layout_above="@+id/user_create"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        android:textSize="24dp" />
+
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="↓"
+
+
+            android:background="#00ff00"
+            android:textColor="#ffffff"
+
+            android:id="@+id/user_create"
+            android:layout_gravity="center_horizontal"
+            android:singleLine="false"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="36dp"
+        android:layout_marginTop="0dp" />
+
+</LinearLayout>
+
