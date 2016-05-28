@@ -74,11 +74,8 @@ public class FavoriteNews extends Fragment {
             String body;
             String create_at;
             String image_url;
-            int width = 0;
-            int height = 0;
-            int server_news_id;
-
-            int group_id;
+            int width;
+            int height;
 
             String acquisition_dateTmp;
             @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 E曜日");

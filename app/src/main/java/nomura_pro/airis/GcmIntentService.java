@@ -50,6 +50,9 @@ public class GcmIntentService extends IntentService {
                 Log.d(TAG,"messageType: " + messageType + ",body:" + extras.toString());
             }
         }
+
+        System.out.println(extras.toString());
+
         GcmBroadcastReceiver.completeWakefulIntent(intent);
 
         type = extras.getString("type");

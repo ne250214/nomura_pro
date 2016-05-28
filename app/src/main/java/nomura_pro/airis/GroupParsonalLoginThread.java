@@ -64,6 +64,7 @@ public class GroupParsonalLoginThread extends AsyncTask<String, Void, String> {
             ContentValues values = new ContentValues();
             values.put("room_id", my_user_data[2]);
             values.put("type", 0);
+            values.put("last_updated", 0);
             db.insert("group_table", null, values);
 
             Cursor c = db.query("group_table", new String[]{"_id", "room_id","name", "type"},
@@ -76,14 +77,9 @@ public class GroupParsonalLoginThread extends AsyncTask<String, Void, String> {
             values.put("group_id", group_id);
             db.update("friend_table", values, "screen_name=?", new String[]{screen});
 
-            Intent intent = new Intent();
-            intent.setClassName("nomura_pro.airis", "nomura_pro.airis.SendMessage");
-            intent.putExtra("id", m_interlocutor_id);
-            intent.putExtra("group_id", group_id);
-            intent.putExtra("name",name);
-            m_Activity.startActivity(intent);
+            TalkListUpdateAndNewsGetThread tluangt = new TalkListUpdateAndNewsGetThread(m_Activity,m_pref, my_user_data[2],0,group_id,name,screen);
+            tluangt.execute();
         }
-
         else if (my_user_data[0].equals("undefined_session_id")){
 
             SharedPreferences.Editor editor = m_pref.edit();

@@ -49,7 +49,7 @@ public class NewsListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.news_list, container, false);
-        layout = (LinearLayout)v.findViewById(R.id.news_list_linerlayout);
+        layout = (LinearLayout) v.findViewById(R.id.news_list_linerlayout);
 
         return v;
     }
@@ -61,20 +61,20 @@ public class NewsListFragment extends Fragment {
         Date date = null;
         String year = String.valueOf(calendar.get(Calendar.YEAR));
         String month;
-        if(10>calendar.get(Calendar.MONTH) + 1){
-            month = "0"+String.valueOf(calendar.get(Calendar.MONTH) + 1);
-        }else {
+        if (10 > calendar.get(Calendar.MONTH) + 1) {
+            month = "0" + String.valueOf(calendar.get(Calendar.MONTH) + 1);
+        } else {
             month = String.valueOf(calendar.get(Calendar.MONTH) + 1);
         }
         String DATE;
-        if(10>calendar.get(Calendar.DATE)){
-            DATE = "0"+String.valueOf(calendar.get(Calendar.DATE));
-        }else {
+        if (10 > calendar.get(Calendar.DATE)) {
+            DATE = "0" + String.valueOf(calendar.get(Calendar.DATE));
+        } else {
             DATE = String.valueOf(calendar.get(Calendar.DATE));
         }
 
         try {
-            date = DateFormat.getDateInstance().parse(year+"/"+month+"/"+DATE);
+            date = DateFormat.getDateInstance().parse(year + "/" + month + "/" + DATE);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -84,8 +84,8 @@ public class NewsListFragment extends Fragment {
         try {
             assert date != null;
 
-            c = db.query(false,"news_table", new String[]{"_id", "title", "type_id", "body", "link_url", "create_at", "image_url", "width", "height", "acquisition_date", "favorite","image_byte"},
-                    null, null, null, null, "acquisition_date DESC","15");
+            c = db.query(false, "news_table", new String[]{"_id", "title", "type_id", "body", "link_url", "create_at", "image_url", "width", "height", "acquisition_date", "favorite", "image_byte"},
+                    null, null, null, null, "acquisition_date DESC", "15");
 
             String acquisition_date = "";
 
@@ -100,11 +100,8 @@ public class NewsListFragment extends Fragment {
             String body;
             String create_at;
             String image_url;
-            int width = 0;
-            int height = 0;
-            int server_news_id;
-
-            int group_id;
+            int width;
+            int height;
 
             String acquisition_dateTmp;
             @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 E曜日");
@@ -112,73 +109,73 @@ public class NewsListFragment extends Fragment {
             boolean isEof = c.moveToFirst();
             while (isEof) {
 
-                    //new String[]{"_id", "title", "type_id", "body", "link_url", "create_at","image_url", "width", "height","acquisition_date", "favorite"}
-                    final int id = c.getInt(0);
-                    final String title = c.getString(1);
-                    type_id = c.getInt(2);
-                    body = c.getString(3);
-                    final String link_url = c.getString(4);
-                    create_at = c.getString(5);
-                    image_url = c.getString(6);
-                    width = c.getInt(7);
-                    height = c.getInt(8);
+                //new String[]{"_id", "title", "type_id", "body", "link_url", "create_at","image_url", "width", "height","acquisition_date", "favorite"}
+                final int id = c.getInt(0);
+                System.out.println(id);
+                final String title = c.getString(1);
+                type_id = c.getInt(2);
+                body = c.getString(3);
+                final String link_url = c.getString(4);
+                create_at = c.getString(5);
+                image_url = c.getString(6);
+                width = c.getInt(7);
+                height = c.getInt(8);
 
-                    final long data_long = c.getLong(9);
+                final long data_long = c.getLong(9);
 
-                    fav_boolean[i] = c.getInt(10) != 0;
-                    byte[] blob = c.getBlob(11);
+                fav_boolean[i] = c.getInt(10) != 0;
+                byte[] blob = c.getBlob(11);
 
-                    acquisition_dateTmp = sdf.format(data_long);
+                acquisition_dateTmp = sdf.format(data_long);
 
-                    if (!acquisition_date.equals(acquisition_dateTmp)) {
-                        acquisition_date = acquisition_dateTmp;
-                        setDate(layout, acquisition_date);
-                    }
-
-                    setTitle(layout, title, link_url);
-
-                    setBody(layout, body, link_url);
-
-                    setImage(layout, image_url, blob, id, width, height, link_url);
-
-
-                    TextView line = new TextView(activity);
-                    line.setBackgroundResource(R.drawable.line);
-
-
-                    LinearLayout l2 = new LinearLayout(activity);
-                    l2.setOrientation(LinearLayout.HORIZONTAL);
-                    l2.setGravity(Gravity.RIGHT);
-
-                    final TextView genreTV = new TextView(activity);
-                    String create_at_spl[] = create_at.split(" ", 3);
-                    genreTV.setText(create_at_spl[0] + " " + returnGenre(type_id));
-                    genreTV.setTextSize(15);
-                    l2.addView(genreTV);
-
-                    Space space = new Space(activity);
-                    l2.addView(space, new LinearLayout.LayoutParams(20, 0));
-
-                    setShareButton(l2,id);
-
-                    //お気に入りボタンを置く
-                    setFavoriteButton(l2, id, i);
-
-                    //ツイートボタンを置く
-                    setTweetButton(l2,title,link_url);
-
-                    Space space2 = new Space(activity);
-                    l2.addView(space2, new LinearLayout.LayoutParams(20, 0));
-
-                    layout.addView(l2);
-                    layout.addView(line);
-
-                    i++;
-                    isEof = c.moveToNext();
+                if (!acquisition_date.equals(acquisition_dateTmp)) {
+                    acquisition_date = acquisition_dateTmp;
+                    setDate(layout, acquisition_date);
                 }
 
-        }
-        finally {
+                setTitle(layout, title, link_url);
+
+                setBody(layout, body, link_url);
+
+                setImage(layout, image_url, blob, id, width, height, link_url);
+
+
+                TextView line = new TextView(activity);
+                line.setBackgroundResource(R.drawable.line);
+
+
+                LinearLayout l2 = new LinearLayout(activity);
+                l2.setOrientation(LinearLayout.HORIZONTAL);
+                l2.setGravity(Gravity.RIGHT);
+
+                final TextView genreTV = new TextView(activity);
+                String create_at_spl[] = create_at.split(" ", 3);
+                genreTV.setText(create_at_spl[0] + " " + returnGenre(type_id));
+                genreTV.setTextSize(15);
+                l2.addView(genreTV);
+
+                Space space = new Space(activity);
+                l2.addView(space, new LinearLayout.LayoutParams(20, 0));
+
+                setShareButton(l2, id);
+
+                //お気に入りボタンを置く
+                setFavoriteButton(l2, id, i);
+
+                //ツイートボタンを置く
+                setTweetButton(l2, title, link_url);
+
+                Space space2 = new Space(activity);
+                l2.addView(space2, new LinearLayout.LayoutParams(20, 0));
+
+                layout.addView(l2);
+                layout.addView(line);
+
+                i++;
+                isEof = c.moveToNext();
+            }
+
+        } finally {
             assert c != null;
             c.close();
             db.close();
@@ -188,7 +185,7 @@ public class NewsListFragment extends Fragment {
     }
 
     private void setImage(LinearLayout layout, String image_url, byte[] blob, int id, int width, int height, final String link_url) {
-        if(!image_url.equals("null")) {
+        if (!image_url.equals("null")) {
             //imageの表示場所
 
             ImageView image = new ImageView(activity);
@@ -219,15 +216,15 @@ public class NewsListFragment extends Fragment {
                 image.setLayoutParams(new LinearLayout.LayoutParams(width, height));
                 image.setImageBitmap(BitmapUtils.createBitmap(blob, width, height));
 
-            }catch (java.lang.NullPointerException e){
-                ImageGetTask task = new ImageGetTask(activity, id, width, height, imageLay,image);
+            } catch (java.lang.NullPointerException e) {
+                ImageGetTask task = new ImageGetTask(activity, id, width, height, imageLay, image);
                 task.execute(image_url);
             }
         }
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
 
         activity = getActivity();
@@ -246,7 +243,7 @@ public class NewsListFragment extends Fragment {
         db.close();
     }
 
-    private void setDate(LinearLayout l,String date){
+    private void setDate(LinearLayout l, String date) {
         TextView dateTV = new TextView(activity);
         dateTV.setGravity(Gravity.CENTER);
         dateTV.setText(date);
@@ -257,7 +254,7 @@ public class NewsListFragment extends Fragment {
         l.addView(dateTV);
     }
 
-    private void setTitle(LinearLayout l,String title, final String link_url){
+    private void setTitle(LinearLayout l, String title, final String link_url) {
         TextView titleTV = new TextView(activity);
         titleTV.setText(title);
         titleTV.setTextSize(15);
@@ -282,7 +279,7 @@ public class NewsListFragment extends Fragment {
         l.addView(titleTV);
     }
 
-    private void setBody(LinearLayout l, String body, final String link_url){
+    private void setBody(LinearLayout l, String body, final String link_url) {
         TextView bodyTV = new TextView(activity);
         bodyTV.setText(body);
         bodyTV.setTextSize(15);
@@ -304,20 +301,21 @@ public class NewsListFragment extends Fragment {
         l.addView(bodyTV);
     }
 
-    private void openLink(String link_url){
+    private void openLink(String link_url) {
         Intent intent = new Intent();
         intent.setClassName("nomura_pro.airis", "nomura_pro.airis.MyWebView");
         intent.putExtra("url", link_url);
 
         activity.startActivity(intent);
     }
-    private void openLink_brows(String link_url){
+
+    private void openLink_brows(String link_url) {
         Uri uri = Uri.parse(link_url);
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         activity.startActivity(intent);
     }
 
-    private void setFavoriteButton(LinearLayout l, final int id, final int i){
+    private void setFavoriteButton(LinearLayout l, final int id, final int i) {
         final Button fav = new Button(activity);
         if (!fav_boolean[i]) {
             fav.setBackgroundResource(R.drawable.fav_btn);
@@ -365,7 +363,7 @@ public class NewsListFragment extends Fragment {
         l.addView(fav, new LinearLayout.LayoutParams(100, 100));
     }
 
-    private void setTweetButton(LinearLayout l,final String title, final String link_url){
+    private void setTweetButton(LinearLayout l, final String title, final String link_url) {
         //Tweetボタン
         Button tweet_btn = new Button(activity);
         tweet_btn.setTextColor(Color.WHITE);
@@ -374,7 +372,7 @@ public class NewsListFragment extends Fragment {
         tweet_btn.setOnClickListener(
                 new View.OnClickListener() {
                     public void onClick(View v) {
-                        Tweet.tweeting( activity, title, link_url);
+                        Tweet.tweeting(activity, title, link_url);
                     }
                 }
         );
@@ -382,7 +380,7 @@ public class NewsListFragment extends Fragment {
         l.addView(tweet_btn);
     }
 
-    private void setShareButton(LinearLayout l, final int id){
+    private void setShareButton(LinearLayout l, final int id) {
         //共有ボタン
         Button share_btn = new Button(activity);
         share_btn.setText("共有");
@@ -400,33 +398,25 @@ public class NewsListFragment extends Fragment {
         l.addView(share_btn);
     }
 
-    static String returnGenre(int type){
+    static String returnGenre(int type) {
         String result = null;
-        if(type == 1){
+        if (type == 1) {
             result = "ニュース";
-        }
-        else if(type == 2){
+        } else if (type == 2) {
             result = "エンタメ";
-        }
-        else if(type == 3){
+        } else if (type == 3) {
             result = "スポーツ";
-        }
-        else if(type == 4){
+        } else if (type == 4) {
             result = "ライフスタイル";
-        }
-        else if(type == 5){
+        } else if (type == 5) {
             result = "テクノロジー";
-        }
-        else if(type == 11){
+        } else if (type == 11) {
             result = "グルメ";
-        }
-        else if(type == 12){
+        } else if (type == 12) {
             result = "旅行";
-        }
-        else if(type == 13){
+        } else if (type == 13) {
             result = "ゲーム";
-        }
-        else if(type == 14){
+        } else if (type == 14) {
             result = "アニメ";
         }
         return result;

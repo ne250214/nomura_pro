@@ -37,7 +37,7 @@ public class SendMessageThread extends AsyncTask<String, Void, String> {
     String m_room_id;
     String m_text;
 
-    public SendMessageThread(Activity activity, SharedPreferences pref, LinearLayout layout, ScrollView sl, EditText textET,int group_id,String room_id,String text) {
+    public SendMessageThread(Activity activity, SharedPreferences pref, LinearLayout layout, ScrollView sl, EditText textET, int group_id, String room_id, String text) {
         this.m_Activity = activity;
         this.m_pref = pref;
         this.m_layout = layout;

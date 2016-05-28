@@ -97,10 +97,10 @@ public class NewsSelectRoom  extends Activity {
                     new String[]{String.valueOf(group_id)}, null, null, null);
 
             c.moveToFirst();
-            String room_id = c.getString(1);
+            String room_id = c.getString(0);
 
-            SendNewsThread thread = new SendNewsThread(this, pref);
-            thread.execute(room_id,String.valueOf(server_news_id));
+            SendNewsThread thread = new SendNewsThread(this, pref,room_id,group_id,id);
+            thread.execute();
         }
     }
 

@@ -192,12 +192,19 @@ public class FriendList extends Fragment {
             gplt.execute(screen, name);
         } else {
             //トークルームを作っていたら
-            Intent intent = new Intent();
-            intent.setClassName("nomura_pro.airis", "nomura_pro.airis.SendMessage");
-            intent.putExtra("group_id", group_id);
-            intent.putExtra("name", name);
-            intent.putExtra("screen", screen);
-            startActivity(intent);
+
+            Cursor c = db.query("group_table", new String[]{"room_id","last_updated"},
+                    "_id=?", new String[]{String.valueOf(group_id)}, null, null, "name DESC");
+
+            c.moveToFirst();
+            String room_id = c.getString(0);
+            long last_updata = c.getLong(1);
+
+            c.close();
+
+            //Activity activity, SharedPreferences pref, String room_id, long last_updata,int group_id,String name,String screen
+            TalkListUpdateAndNewsGetThread tluangt = new TalkListUpdateAndNewsGetThread((Activity) context,pref,room_id,last_updata,group_id,name,screen);
+            tluangt.execute();
         }
     }
 

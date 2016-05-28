@@ -10,6 +10,8 @@ import android.os.AsyncTask;
 import android.os.HandlerThread;
 import android.widget.Toast;
 
+import java.util.Date;
+
 /**
  * Created by ne250214 on 16/05/03.
  */
@@ -65,6 +67,7 @@ public class RoomIdGetThread extends AsyncTask<String, Void, String> {
             ContentValues values = new ContentValues();
             values.put("room_id", my_user_data[2]);
             values.put("type", 0);
+            values.put("last_updated", 0);
             db.insert("group_table", null, values);
 
             Cursor c = db.query("group_table", new String[]{"_id", "room_id","name", "type"},
@@ -77,8 +80,8 @@ public class RoomIdGetThread extends AsyncTask<String, Void, String> {
             values.put("group_id", group_id);
             db.update("friend_table", values, "screen_name=?", new String[]{screen});
 
-            SendNewsThread thread = new SendNewsThread(m_Activity, m_pref);
-            thread.execute(my_user_data[2],String.valueOf(m_server_news_id));
+            SendNewsThread thread = new SendNewsThread(m_Activity, m_pref,my_user_data[2],group_id,m_server_news_id);
+            thread.execute();
         }
 
         else if (my_user_data[0].equals("undefined_session_id")){

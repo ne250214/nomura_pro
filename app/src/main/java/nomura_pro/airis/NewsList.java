@@ -77,9 +77,8 @@ public class NewsList extends Activity {
             String body;
             String create_at;
             String image_url;
-            int width = 0;
-            int height = 0;
-            int server_news_id;
+            int width;
+            int height;
 
             String acquisition_dateTmp;
             @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 E曜日");
@@ -350,8 +349,8 @@ public class NewsList extends Activity {
                                 "このトークルームに共有",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which){
-                                        SendNewsThread thread = new SendNewsThread(NewsList.this, pref);
-                                        thread.execute(room_id,String.valueOf(id));
+                                        SendNewsThread thread = new SendNewsThread(NewsList.this, pref,room_id,group_id,id);
+                                        thread.execute();
                                     }
                                 });
                         alertDlg.setNegativeButton(

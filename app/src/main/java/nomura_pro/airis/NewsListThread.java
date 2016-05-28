@@ -14,37 +14,23 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * Created by ne250214 on 16/05/25.
+ * Created by ne250214 on 16/05/21.
  */
-public class NewsGetThread extends AsyncTask<String, Void, String> {
+public class NewsListThread  extends AsyncTask<String, Void, String> {
 
     private Activity m_Activity;
     SharedPreferences m_pref;
-    String m_news_id_text;
-
-    String m_room_id;
     int m_group_id;
-    String m_name;
-    String m_screen;
+    String m_room_id;
 
-    public NewsGetThread(Activity activity,SharedPreferences pref, ArrayList<Integer> news_id_list,String room_id,int group_id,String name,String screen){
-        m_Activity = activity;
-        m_pref = pref;
-
-        m_room_id = room_id;
-        m_group_id = group_id;
-        m_name = name;
-        m_screen = screen;
-
-        m_news_id_text = "";
-        for(int i=0;i<news_id_list.size();i++){
-            if(i>1) m_news_id_text = m_news_id_text + ",";
-            m_news_id_text = m_news_id_text + news_id_list.get(i).toString();
-        }
+    public NewsListThread(Activity activity,SharedPreferences pref,int group_id,String room_id) {
+        this.m_Activity = activity;
+        this.m_pref = pref;
+        this.m_group_id = group_id;
+        this.m_room_id = room_id;
     }
 
     @Override
@@ -55,9 +41,7 @@ public class NewsGetThread extends AsyncTask<String, Void, String> {
 
         String message;
 
-        //get(ユーザ識別番号、セッションid、ニュースid(カンマ区切り)例:1,2,3,4,5)
-        message = SocketConnect.connect("news get " + m_pref.getString("id", "null") + " " + m_pref.getString("session", "null") + " " + m_news_id_text);
-        System.out.println(SocketConnect.connect("news get " + m_pref.getString("id", "null") + " " + m_pref.getString("session", "null") + " " + m_news_id_text));
+        message = SocketConnect.connect("news list " + m_pref.getString("id", "null") + " " + m_pref.getString("session", "null") + " " + m_room_id);
 
         return message;
     }
@@ -73,8 +57,8 @@ public class NewsGetThread extends AsyncTask<String, Void, String> {
 
         String[] my_user_data = param.split(" ", 3);
 
-        MySQLiteOpenHelper dbHelper= new MySQLiteOpenHelper(m_Activity);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        MySQLiteOpenHelper dbHelper;
+        SQLiteDatabase db;
 
         if (my_user_data[0].equals("accept")){
 
@@ -84,19 +68,26 @@ public class NewsGetThread extends AsyncTask<String, Void, String> {
 
             ContentValues values;
 
+            int news_id[] = new int[0];
+
             if(!(my_user_data[2].equals(""))) {
 
                 try {
                     JSONArray json_arr = new JSONArray(my_user_data[2]);
-                    //{news_id:値,title:値,type_id:値,body:値,link_url:値,create_at:値,image_url:値,width:値,height:値}
+
+                    news_id = new int[json_arr.length()];
 
                     for (int i = 0; i < json_arr.length(); i++) {
                         JSONObject json = (JSONObject) json_arr.get(i);
 
+                        dbHelper = new MySQLiteOpenHelper(m_Activity);
+                        db = dbHelper.getWritableDatabase();
                         long recodeCount = DatabaseUtils.queryNumEntries(db, "news_table", "_id = ?",
                                 new String[]{json.getString("news_id")});
 
                         values = new ContentValues();
+
+                        news_id[i] = json.getInt("news_id");
 
                         Date d = new Date();
 
@@ -144,14 +135,13 @@ public class NewsGetThread extends AsyncTask<String, Void, String> {
                 }
             }
 
-
             Intent intent = new Intent();
-            intent.setClassName("nomura_pro.airis", "nomura_pro.airis.SendMessage");
-            intent.putExtra("room_id", m_room_id);
+            intent.setClassName("nomura_pro.airis", "nomura_pro.airis.NewsList");
             intent.putExtra("group_id", m_group_id);
-            intent.putExtra("name", m_name);
-            intent.putExtra("screen", m_screen);
+            intent.putExtra("room_id", m_room_id);
+            intent.putExtra("news_id", news_id);
             m_Activity.startActivity(intent);
+
         }
         else if (my_user_data[0].equals("undefined_session_id")){
 
@@ -176,4 +166,5 @@ public class NewsGetThread extends AsyncTask<String, Void, String> {
             Toast.makeText(m_Activity, my_user_data[0], Toast.LENGTH_LONG).show();
         }
     }
+
 }

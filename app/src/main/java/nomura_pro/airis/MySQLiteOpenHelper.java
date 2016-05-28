@@ -55,9 +55,11 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper{
                 + "_id integer primary key autoincrement,"
                 + "room_id char(32) not null,"
                 + "name char(32),"
-                + "type bit(2) not null);");
+                + "type bit(2) not null,"
+                + "last_updated integer not null);");
 
         //newsテーブルの_idはサーバのidと同じにする
+        //typeはジャンル
         db.execSQL("create table news_table ("
                 + "_id integer primary key ,"
                 + "title char(32) not null,"
