@@ -44,11 +44,13 @@ public class UserLoginThread extends AsyncTask<String, Void, String> {
 
         String message = null;
         try {
-
+            System.out.println("送るよ");
             GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this.m_Activity);
             final String regId = gcm.register(SENDER_ID);
-
+            System.out.println("送った");
+            System.out.println("ソケット");
             message = SocketConnect.connect("user login " + address + " " + pass + " " + regId);
+            System.out.println("ソケット終わり");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -62,6 +64,8 @@ public class UserLoginThread extends AsyncTask<String, Void, String> {
 
         //accept Hash化したuser_id 名前 メールアドレス プロフィール 検索用id セッションid
         //different_computer name address
+
+        System.out.println(param);
 
         String[] my_user_data = param.split(" ", 0);
 

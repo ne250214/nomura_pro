@@ -1,9 +1,9 @@
 package nomura_pro.airis;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
-import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -19,28 +19,43 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * Created by ne250214 on 16/04/27.
+ * Created by ne250214 on 16/06/01.
  */
-public class SendNewsThread extends AsyncTask<String, Void, String> {
+public class GroupParsonalLoginAndTalkListUpdateAndNewsGetThread extends AsyncTask<String, Void, String> {
 
-    Activity m_activity;
+    private Activity m_Activity;
     SharedPreferences m_pref;
 
-    String m_room_id;
     int m_group_id;
-    int m_news_id;
+    String m_name;
+    String m_screen;
+    String m_room_id;
 
-    public SendNewsThread(Activity activity, SharedPreferences pref, String room_id, int group_id, int news_id) {
-        this.m_activity = activity;
+    ProgressDialog dialog;
+
+    public GroupParsonalLoginAndTalkListUpdateAndNewsGetThread(Activity activity, SharedPreferences pref,String scrren,String name) {
+        this.m_Activity = activity;
         this.m_pref = pref;
-        this.m_room_id = room_id;
-        this.m_group_id = group_id;
-        this.m_news_id = news_id;
+        this.m_screen = scrren;
+        this.m_name = name;
+        //group_idは後で取得
+    }
+
+    @Override
+    protected void onPreExecute() {
+        dialog = new ProgressDialog(m_Activity);
+        dialog.setTitle("Please wait");
+        dialog.setMessage("Loading data...");
+        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        dialog.setCancelable(true);
+        //dialog.setOnCancelListener(this);
+        dialog.setMax(100);
+        dialog.setProgress(0);
+        dialog.show();
     }
 
     @Override
@@ -51,31 +66,49 @@ public class SendNewsThread extends AsyncTask<String, Void, String> {
 
         String message;
 
-        //news(ユーザ識別番号、セッションid、グループコード、ニュースid)
-        message = SocketConnect.connect("send news " + m_pref.getString("id", "null") + " " + m_pref.getString("session", "null") + " " + m_room_id + " " + m_news_id);
+        //parsonal_login(ユーザ識別番号、セッションid、検索id)
+        message = SocketConnect.connect("group parsonal_login " + m_pref.getString("id", "null") + " " + m_pref.getString("session", "null") + " " + m_screen);
 
         String[] my_user_data = message.split(" ", 0);
-
-
         if (my_user_data[0].equals("accept")) {
+            dialog.setProgress(33);
+
+            System.out.println("group parsonal_login");
 
             SharedPreferences.Editor editor = m_pref.edit();
             editor.putString("session", my_user_data[1]);
             editor.apply();
 
-            MySQLiteOpenHelper helper = new MySQLiteOpenHelper(m_activity);
-            SQLiteDatabase db = helper.getReadableDatabase();
-            Cursor c = db.query("group_table", new String[]{"last_updated"},
-                    "_id=?", new String[]{String.valueOf(m_group_id)}, null, null, null);
+            MySQLiteOpenHelper helper = new MySQLiteOpenHelper(m_Activity);
+            final SQLiteDatabase db = helper.getReadableDatabase();
+
+            ContentValues values = new ContentValues();
+            values.put("room_id", my_user_data[2]);
+            values.put("type", 0);
+            values.put("last_updated", 0);
+            db.insert("group_table", null, values);
+
+            Cursor c = db.query("group_table", new String[]{"_id"},
+                    "room_id=?", new String[]{my_user_data[2]}, null, null, null);
 
             c.moveToFirst();
-            long last_updata = c.getLong(0);
+            m_group_id = c.getInt(0);
 
-            @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
-            message = SocketConnect.connect("group talk " + m_pref.getString("id", "null") + " " + m_pref.getString("session", "null") + " " + m_room_id + " " + sdf.format(last_updata));
+            values = new ContentValues();
+            values.put("group_id", m_group_id);
+            db.update("friend_table", values, "screen_name=?", new String[]{m_screen});
+
+            m_room_id = my_user_data[2];
+
+            message = SocketConnect.connect("group talk " + m_pref.getString("id", "null") + " " + m_pref.getString("session", "null") + " " + m_room_id + " ''0");
 
             my_user_data = message.split(" ", 3);
+
             if (my_user_data[0].equals("accept")) {
+                dialog.setProgress(66);
+
+
+                System.out.println("group talk");
 
                 //accept セッションid JSON(talk) JSON(news)(必要に応じて数が変化の可能性あり)
                 //        JSON
@@ -87,8 +120,6 @@ public class SendNewsThread extends AsyncTask<String, Void, String> {
                 editor.apply();
 
                 String my_screen = m_pref.getString("screen_name", "");
-
-                ContentValues values;
 
                 int sender_id;
                 long recodeCount;
@@ -143,6 +174,7 @@ public class SendNewsThread extends AsyncTask<String, Void, String> {
                                 db.insert("talk_table", null, values);
                             } catch (org.json.JSONException e) {
                                 //messageがなかったらニュース
+                                boolean_ngt = true;
                                 values = new ContentValues();
                                 values.put("group_id", m_group_id);
                                 values.put("sender_id", sender_id);
@@ -155,7 +187,6 @@ public class SendNewsThread extends AsyncTask<String, Void, String> {
                                 recodeCount = DatabaseUtils.queryNumEntries(db, "news_table", "_id = ?", new String[]{json.getString("news_id")});
                                 if (recodeCount == 0) {
                                     boolean_ngt = true;
-                                    System.out.println(json.getInt("news_id")+"を追加します");
                                     news_id_list.add(json.getInt("news_id"));
                                 }
                             }
@@ -172,8 +203,9 @@ public class SendNewsThread extends AsyncTask<String, Void, String> {
 
                 if (boolean_ngt) {
                     //ニュースを取得する必要がある
+                    System.out.println("News get");
+
                     String news_id_text = "";
-                    System.out.println(news_id_list.size());
                     for (int i = 0; i < news_id_list.size(); i++) {
                         if (i > 0) {
                             System.out.println(",を追加するよ");
@@ -181,13 +213,13 @@ public class SendNewsThread extends AsyncTask<String, Void, String> {
                         }
                         news_id_text = news_id_text + news_id_list.get(i).toString();
                     }
-                    System.out.println("news get " + m_pref.getString("id", "null") + " " + m_pref.getString("session", "null") + " " + news_id_text);
                     message = SocketConnect.connect("news get " + m_pref.getString("id", "null") + " " + m_pref.getString("session", "null") + " " + news_id_text);
 
-                    System.out.println("message"+message);
                     my_user_data = message.split(" ", 3);
 
                     if (my_user_data[0].equals("accept")) {
+
+                        dialog.setProgress(99);
 
                         editor = m_pref.edit();
                         editor.putString("session", my_user_data[1]);
@@ -251,44 +283,65 @@ public class SendNewsThread extends AsyncTask<String, Void, String> {
                                 e.printStackTrace();
                             }
                         }
+                        return message;
+                    } else {
+                        return message;
                     }
                 }
+                return message;
+            } else {
+                return message;
             }
+
+        } else {
+            return message;
         }
-        return message;
     }
 
     //タスクの終了後にUIスレッドとして起動
     @Override
     protected void onPostExecute(String param) {
 
-        String[] my_user_data = param.split(" ", 0);
+        System.out.println(param);
+
+        //accept セッションid JSON
+        //[{title:値,date:値,url:値},{title:値,date:値,url:値},......]
+
+        String[] my_user_data = param.split(" ", 3);
+
 
         if (my_user_data[0].equals("accept")) {
 
-            m_activity.finish();
+            System.out.println("gplqtluangt end");
 
+            dialog.dismiss();
 
+            Intent intent = new Intent();
+            intent.setClassName("nomura_pro.airis", "nomura_pro.airis.SendMessage");
+            intent.putExtra("room_id", m_room_id);
+            intent.putExtra("group_id", m_group_id);
+            intent.putExtra("name", m_name);
+            intent.putExtra("screen", m_screen);
+            m_Activity.startActivity(intent);
         } else if (my_user_data[0].equals("undefined_session_id")) {
 
+            MySQLiteOpenHelper dbHelper = new MySQLiteOpenHelper(m_Activity);
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
             SharedPreferences.Editor editor = m_pref.edit();
             editor.putBoolean("session_validness", false);
             editor.apply();
 
-            MySQLiteOpenHelper dbHelper = new MySQLiteOpenHelper(m_activity);
-            SQLiteDatabase db = dbHelper.getWritableDatabase();
             db.delete("friend_table", "_id like '%'", null);
             db.delete("talk_table", "_id like '%'", null);
 
             Intent intent = new Intent();
             intent.setClassName("nomura_pro.airis", "nomura_pro.airis.Logout");
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            m_activity.startActivity(intent);
+            m_Activity.startActivity(intent);
         } else if (ErrorMessages.ERROR_HASH_MAP.containsKey(my_user_data[0])) {
-            Toast.makeText(m_activity, ErrorMessages.ERROR_HASH_MAP.get(my_user_data[0]), Toast.LENGTH_LONG).show();
+            Toast.makeText(m_Activity, ErrorMessages.ERROR_HASH_MAP.get(my_user_data[0]), Toast.LENGTH_LONG).show();
         } else {
-            Toast.makeText(m_activity, my_user_data[0], Toast.LENGTH_LONG).show();
+            Toast.makeText(m_Activity, my_user_data[0], Toast.LENGTH_LONG).show();
         }
     }
-
 }

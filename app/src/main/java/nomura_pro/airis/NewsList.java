@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Space;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 
@@ -83,10 +84,13 @@ public class NewsList extends Activity {
             String acquisition_dateTmp;
             @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 E曜日");
 
-            for(i=0;i<news_id.length;i++){
+            if (news_id.length == 0) {
+                Toast.makeText(this, "ニュースがありません", Toast.LENGTH_LONG).show();
+            }else{
+            for (i = 0; i < news_id.length; i++) {
 
-                c = db.query(false,"news_table", new String[]{"_id", "title", "type_id", "body", "link_url", "create_at", "image_url", "width", "height", "acquisition_date", "favorite","image_byte"},
-                        "_id=?", new String[]{String.valueOf(news_id[i])}, null, null, "acquisition_date DESC","20");
+                c = db.query(false, "news_table", new String[]{"_id", "title", "type_id", "body", "link_url", "create_at", "image_url", "width", "height", "acquisition_date", "favorite", "image_byte"},
+                        "_id=?", new String[]{String.valueOf(news_id[i])}, null, null, "acquisition_date DESC", "20");
                 c.moveToFirst();
 
                 //new String[]{"_id", "title", "type_id", "body", "link_url", "create_at","image_url", "width", "height","acquisition_date", "favorite"}
@@ -99,6 +103,15 @@ public class NewsList extends Activity {
                 image_url = c.getString(6);
                 width = c.getInt(7);
                 height = c.getInt(8);
+
+                System.out.println("----------");
+                System.out.println(title);
+                System.out.println(body);
+                System.out.println(link_url);
+                System.out.println(create_at);
+                System.out.println(width);
+                System.out.println(height);
+                System.out.println("----------");
 
                 final long data_long = c.getLong(9);
 
@@ -132,18 +145,19 @@ public class NewsList extends Activity {
                 String create_at_spl[] = create_at.split(" ", 3);
                 genreTV.setText(create_at_spl[0] + " " + returnGenre(type_id));
                 genreTV.setTextSize(15);
+                genreTV.setTextColor(Color.BLACK);
                 l2.addView(genreTV);
 
                 Space space = new Space(getApplicationContext());
                 l2.addView(space, new LinearLayout.LayoutParams(20, 0));
 
-                setShareButton(l2,id);
+                setShareButton(l2, id);
 
                 //お気に入りボタンを置く
                 setFavoriteButton(l2, id, i);
 
                 //ツイートボタンを置く
-                setTweetButton(l2,title,link_url);
+                setTweetButton(l2, title, link_url);
 
                 Space space2 = new Space(getApplicationContext());
                 l2.addView(space2, new LinearLayout.LayoutParams(20, 0));
@@ -152,6 +166,7 @@ public class NewsList extends Activity {
                 layout.addView(line);
 
             }
+        }
         }finally {
             db.close();
             if (c != null) {
@@ -199,9 +214,7 @@ public class NewsList extends Activity {
                     image.setLayoutParams(new LinearLayout.LayoutParams(width, height));
                     image.setImageBitmap(BitmapUtils.createBitmap(blob, width, height));
 
-                }catch (java.lang.NullPointerException e){
-                    ImageGetTask task = new ImageGetTask(getApplicationContext(), id, width, height, imageLay,image);
-                    task.execute(image_url);
+                }catch (java.lang.NullPointerException ignored){
                 }
         }
     }

@@ -89,8 +89,8 @@ public class NewsSelectRoom  extends Activity {
     void sendNews(String name, final String screen, int id, int group_id) {
         if (group_id == 0) {
             //トークルームを作っていなかったら
-            RoomIdGetThread roomIdGetThread = new RoomIdGetThread(this,pref,id,server_news_id);
-            roomIdGetThread.execute(screen,name);
+            SendNewsThreadNotRoomId sendNewsThreadNotRoomId = new SendNewsThreadNotRoomId(this,pref,id,server_news_id,screen,name);
+            sendNewsThreadNotRoomId.execute();
         } else {
             //トークルームを作っていたら
             Cursor c = db.query("group_table", new String[]{"room_id"}, "_id=?",

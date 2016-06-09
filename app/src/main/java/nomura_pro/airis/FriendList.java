@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,17 +45,22 @@ public class FriendList extends Fragment {
 
     public void setDB() {
 
-        Cursor c = db.query("friend_table", new String[]{"_id", "name", "profile", "screen_name", "type", "group_id"},
+        Cursor c = db.query("friend_table", new String[]{"name", "profile", "screen_name", "type", "group_id"},
                 "type=? OR type=? OR type=?", new String[]{"1", "2", "3"}, null, null, "name DESC");
 
         boolean isEof = c.moveToFirst();
         while (isEof) {
-            final int id = c.getInt(0);
-            final String name = c.getString(1).replaceAll(CommonUtilities.BLANK_CODE, " ");
-            final String profile = c.getString(2).replaceAll(CommonUtilities.BLANK_CODE, " ");
-            final String screen = c.getString(3);
-            final int type = c.getInt(4);
-            final int group_id = c.getInt(5);
+            final String name = c.getString(0).replaceAll(CommonUtilities.BLANK_CODE, " ");
+            final String profile = c.getString(1).replaceAll(CommonUtilities.BLANK_CODE, " ");
+            final String screen = c.getString(2);
+            final int type = c.getInt(3);
+            final int group_id = c.getInt(4);
+
+            System.out.println(name);
+            System.out.println(profile);
+            System.out.println(screen);
+            System.out.println(type);
+            System.out.println(group_id);
 
             TextView tv = new TextView(context);
 
@@ -96,12 +102,12 @@ public class FriendList extends Fragment {
 
                 tv.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
-                        type3onClick(name, screen, id, group_id);
+                        type3onClick(name, screen, group_id);
                     }
                 });
                 nameTV.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
-                        type3onClick(name, screen, id, group_id);
+                        type3onClick(name, screen, group_id);
                     }
                 });
             }
@@ -185,25 +191,26 @@ public class FriendList extends Fragment {
                 ).show();
     }
 
-    void type3onClick(String name, final String screen, int id, int group_id) {
+    void type3onClick(String name, final String screen, int group_id) {
         if (group_id == 0) {
             //トークルームを作っていなかったら
-            GroupParsonalLoginThread gplt = new GroupParsonalLoginThread((Activity) context, pref, id);
-            gplt.execute(screen, name);
+            System.out.println("friend_list");
+            GroupParsonalLoginAndTalkListUpdateAndNewsGetThread nplantluangt = new GroupParsonalLoginAndTalkListUpdateAndNewsGetThread((Activity)context,pref,screen,name);
+            nplantluangt.execute();
         } else {
             //トークルームを作っていたら
 
             Cursor c = db.query("group_table", new String[]{"room_id","last_updated"},
-                    "_id=?", new String[]{String.valueOf(group_id)}, null, null, "name DESC");
+                    "_id=?", new String[]{String.valueOf(group_id)}, null, null, null);
 
             c.moveToFirst();
             String room_id = c.getString(0);
-            long last_updata = c.getLong(1);
+            long last_updatad = c.getLong(1);
 
             c.close();
 
             //Activity activity, SharedPreferences pref, String room_id, long last_updata,int group_id,String name,String screen
-            TalkListUpdateAndNewsGetThread tluangt = new TalkListUpdateAndNewsGetThread((Activity) context,pref,room_id,last_updata,group_id,name,screen);
+            TalkListUpdateAndNewsGetThread tluangt = new TalkListUpdateAndNewsGetThread((Activity) context,pref,room_id,last_updatad,group_id,name,screen);
             tluangt.execute();
         }
     }

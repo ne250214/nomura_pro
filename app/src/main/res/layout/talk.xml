@@ -16,7 +16,7 @@
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:paddingLeft="16dp"
             android:paddingTop="16dp"
@@ -34,7 +34,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:weightSum="1"
-    android:layout_below="@+id/talk_scrollview"
     android:layout_gravity="bottom">
 
     <EditText

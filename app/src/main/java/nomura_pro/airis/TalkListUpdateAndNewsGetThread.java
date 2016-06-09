@@ -138,7 +138,6 @@ public class TalkListUpdateAndNewsGetThread extends AsyncTask<String, Void, Stri
                             db.insert("talk_table", null, values);
                         } catch (org.json.JSONException e) {
                             //messageがなかったらニュース
-                            boolean_ngt = true;
                             values = new ContentValues();
                             values.put("group_id", m_group_id);
                             values.put("sender_id", sender_id);
@@ -167,10 +166,8 @@ public class TalkListUpdateAndNewsGetThread extends AsyncTask<String, Void, Stri
 
             if (boolean_ngt) {
                 //ニュースを取得する必要がある
-                NewsGetThread newsGetThread = new NewsGetThread(m_Activity, m_pref, news_id_list, m_room_id, m_group_id, m_name, my_screen);
-                newsGetThread.execute();
-
                 String news_id_text = "";
+                System.out.println(news_id_list.size());
                 for (int i = 0; i < news_id_list.size(); i++) {
                     if (i > 0) {
                         System.out.println(",を追加するよ");

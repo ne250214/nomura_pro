@@ -24,9 +24,11 @@ import static com.google.android.gms.internal.zzir.runOnUiThread;
  */
 public class GcmIntentService extends IntentService {
     private static final String TAG = "GcmIntentService";
+
     public GcmIntentService() {
         super("GcmIntentService");
     }
+
     private NotificationManager mManager;
 
     String name;
@@ -45,9 +47,9 @@ public class GcmIntentService extends IntentService {
             if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
                 Log.d(TAG, "messageType: " + messageType + ",body:" + extras.toString());
             } else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
-                Log.d(TAG,"messageType: " + messageType + ",body:" + extras.toString());
+                Log.d(TAG, "messageType: " + messageType + ",body:" + extras.toString());
             } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-                Log.d(TAG,"messageType: " + messageType + ",body:" + extras.toString());
+                Log.d(TAG, "messageType: " + messageType + ",body:" + extras.toString());
             }
         }
 
@@ -55,84 +57,54 @@ public class GcmIntentService extends IntentService {
 
         GcmBroadcastReceiver.completeWakefulIntent(intent);
 
-        type = extras.getString("type");
+        screen = extras.getString("search_id");
+        message = extras.getString("message");
 
         MySQLiteOpenHelper dbHelper = new MySQLiteOpenHelper(this);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
 
-        if (type != null) {
-            switch (type) {
-                case "no_contact":
+        //"no_contact"
 
-                    name = extras.getString("name");
-                    assert name != null;
-                    name = name.replaceAll(CommonUtilities.BLANK_CODE, " ");
-                    profile = extras.getString("profile");
-                    assert profile != null;
-                    profile = profile.replaceAll(CommonUtilities.BLANK_CODE, " ").replaceAll(CommonUtilities.LINE_BREAK_DODE, " ");
-                    screen = extras.getString("search_id");
+        //name = extras.getString("name");
+        //assert name != null;
+        //name = name.replaceAll(CommonUtilities.BLANK_CODE, " ");
+        //profile = extras.getString("profile");
+        //assert profile != null;
+        //profile = profile.replaceAll(CommonUtilities.BLANK_CODE, " ").replaceAll(CommonUtilities.LINE_BREAK_DODE, " ");
+        //screen = extras.getString("search_id");
 
-                    generateNotification(this);
+        //generateNotification(this);
 
-                    values.put("name", name);
-                    values.put("profile", profile);
-                    values.put("screen_name",screen);
-                    values.put("type", 2);
-                    db.insert("friend_table", null, values);
-                    break;
 
-                case "reapplied":
-                    name = extras.getString("name");
-                    assert name != null;
-                    name = name.replaceAll(CommonUtilities.BLANK_CODE, " ");
-                    profile = extras.getString("profile");
-                    assert profile != null;
-                    profile = profile.replaceAll(CommonUtilities.BLANK_CODE, " ").replaceAll(CommonUtilities.LINE_BREAK_DODE, " ");
-                    screen = extras.getString("search_id");
+        //case "reapplied":
+        //name = extras.getString("name");
+        //assert name != null;
+        //name = name.replaceAll(CommonUtilities.BLANK_CODE, " ");
+        //profile = extras.getString("profile");
+        //assert profile != null;
+        //profile = profile.replaceAll(CommonUtilities.BLANK_CODE, " ").replaceAll(CommonUtilities.LINE_BREAK_DODE, " ");
+        //screen = extras.getString("search_id");
 
-                    generateNotification(this);
+        //generateNotification(this);
 
-                    values.put("name",name);
-                    values.put("profile", profile);
-                    values.put("screen_name",screen);
-                    values.put("type", 3);
-                    db.update("friend_table", values, "screen_name=?", new String[]{extras.getString("search_id")});
-                    break;
 
-                case "parsonal":
-                    name = extras.getString("name");
-                    assert name != null;
-                    name = name.replaceAll(CommonUtilities.BLANK_CODE, " ");
-                    screen = extras.getString("search_id");
-                    message = extras.getString("message");
-                    assert message != null;
-                    message = message.replaceAll(CommonUtilities.LINE_BREAK_DODE, "\n").replaceAll(CommonUtilities.BLANK_CODE," ");
+        //case "parsonal":
+        name = extras.getString("name");
+        try {
+            Cursor c = db.query("friend_table", new String[]{"name", "profile"},
+                    "screen_name=?", new String[]{screen}, null, null, null);
+            c.moveToFirst();
 
-                    try {
-                        Cursor c = db.query("friend_table", new String[]{"_id", "name", "profile", "screen_name", "type", "group_id"},
-                                "screen_name=?", new String[]{screen}, null, null, "name DESC");
-                        c.moveToFirst();
+            name = c.getString(0);
+            profile = c.getString(1);
 
-                        int id = c.getInt(0);
+        } catch (android.database.CursorIndexOutOfBoundsException ignored) {
 
-                        values.put("sender_id", id);
-                        values.put("receiver_id", 0);
-                        values.put("text", message);
-                        db.insert("talk_table", null, values);
-                    }catch ( android.database.CursorIndexOutOfBoundsException ignored){
-
-                    }
-                    generateNotification(this);
-
-                    break;
-                case "group":
-                    break;
-                default:
-                    System.out.println("type ERROR");
-                    break;
-            }
         }
+        generateNotification(this);
+
+        ;
+        //case "group":
 
     }
 
@@ -145,33 +117,30 @@ public class GcmIntentService extends IntentService {
         Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
         Notification.Builder builder = new Notification.Builder(context);
 
-        switch (type) {
-            case "no_contact":
-                builder.setTicker(name + "さんから申請されました");
-                builder.setContentTitle(name + "さんからの申請です");
-                //builder.setContentInfo("//名前。プロフィール");
-                builder.setContentText(profile);
-                break;
-            case "reapplied":
-                builder.setTicker(name + "さんに承認されました");
-                builder.setContentTitle(name + "さんに承認されました");
-                //builder.setContentInfo("//名前。プロフィール");
-                builder.setContentText(profile);
-                break;
-            case "parsonal":
-                builder.setTicker(name + "：" + message);
-                builder.setContentTitle(name);
-                builder.setContentText(message);
+        //case "no_contact":
+        //    builder.setTicker(name + "さんから申請されました");
+        //    builder.setContentTitle(name + "さんからの申請です");
+        //    //builder.setContentInfo("//名前。プロフィール");
+        //    builder.setContentText(profile);
 
-                try {
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            SendMessage.catchMessage(name,message);
-                        }
-                    });
-                }catch (java.lang.NullPointerException ignored){
+        //case "reapplied":
+        //    builder.setTicker(name + "さんに承認されました");
+        //    builder.setContentTitle(name + "さんに承認されました");
+        //    builder.setContentInfo("//名前。プロフィール");
+        //    builder.setContentText(profile);
+
+        //case "parsonal":
+        builder.setTicker(name + "：" + message);
+        builder.setContentTitle(name);
+        builder.setContentText(message);
+
+        try {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    SendMessage.catchMessage(name, message);
                 }
-                break;
+            });
+        } catch (java.lang.NullPointerException ignored) {
         }
 
         builder.setWhen(System.currentTimeMillis());
